@@ -4,7 +4,82 @@ use std::fs;
 
 fn main() {
     //stage1();
-    stage2();
+    //stage2();
+    day2stage1();
+}
+
+fn day2stage1() {
+    println!("Day 2 challenge!");
+
+    //take input from file
+    let list = fs::read_to_string("input.txt").expect("Error reading file");
+
+    let mut points = 0;
+    
+    for line in list.lines() {
+        let first_char = line.chars().nth(0).unwrap();
+        let last_char = line.chars().last().unwrap();
+
+        //switch for first char
+        match last_char {
+            'X' => { //need to loose
+                points += 0;
+
+                if first_char == 'A' { //enemy is rock
+                    //you choose scissors
+                    points += 3; 
+                }
+                if first_char == 'B' { //enemy is paper
+                    //you choose rock
+                    points += 1;
+                }
+                if first_char == 'C' { //enemy is scissors
+                    //you choose paper
+                    points += 2;
+                }
+            },
+            'Y' => { //need to draw
+                points += 3;
+
+                if first_char == 'A' { //enemy is rock
+                    //you choose rock
+                    points += 1; 
+                }
+                if first_char == 'B' { //enemy is paper
+                    //you choose paper
+                    points += 2;
+                }
+                if first_char == 'C' { //enemy is scissors
+                    //you choose scissors
+                    points += 3;
+                }
+            },
+            'Z' => { //need to win
+                points += 6;
+
+                if first_char == 'A' { //enemy is rock
+                    //you choose paper
+                    points += 2; 
+                }
+                if first_char == 'B' { //enemy is paper
+                    //you choose scissors
+                    points += 3;
+                }
+                if first_char == 'C' { //enemy is scissors
+                    //you choose rock
+                    points += 1;
+                }
+            },
+            _ => {
+                println!("Error");
+            }
+        }
+
+    }
+
+    println!("Points: {}", points);
+
+
 }
 
 
