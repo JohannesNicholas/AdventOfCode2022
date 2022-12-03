@@ -1,11 +1,16 @@
 //use the fs module
 use std::fs;
 
+//use the day3.rs file
+mod day3;
+
 
 fn main() {
     //stage1();
     //stage2();
-    day2stage1();
+    //day2stage1();
+    day3::stage1();
+    day3::stage2();
 }
 
 fn day2stage1() {
