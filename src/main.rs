@@ -4,14 +4,14 @@ use std::fs;
 //use the day3.rs file
 mod day3;
 mod day4;
-
+mod day5;
 
 fn main() {
     //stage1();
     //stage2();
     //day2stage1();
-    day4::stage1();
-    day4::stage2();
+    day5::stage1();
+    day5::stage2();
 }
 
 fn day2stage1() {
