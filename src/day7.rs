@@ -11,8 +11,6 @@ pub fn stage1() {
 
     //split input into lines as an array
     let mut lines = list.lines();
-    
-    let mut location = "".to_string();
 
     let mut currentDirSizes = Vec::new();
 
@@ -32,17 +30,6 @@ pub fn stage1() {
 
             if dir_name == ".." {
                 //go up a directory
-                //remove the last directory from the location
-                let mut new_location = "".to_string();
-                
-                let locations = location.split("/").collect::<Vec<&str>>();
-
-                for i in 0..locations.len()-2 {
-                    new_location = new_location + locations[i] + "/";
-                }
-
-                location = new_location;
-
                 
                 
                 let dir_size = currentDirSizes.pop();
@@ -58,12 +45,12 @@ pub fn stage1() {
                     
                     size_counter += dir_size;
                     
-                    println!("+({}, {})", dir_size, location)
+                    
 
                 }
             } else {
                 //go down a directory
-                location = location + dir_name + "/";
+                
                 currentDirSizes.push(0);
             }
             continue;
@@ -89,7 +76,7 @@ pub fn stage1() {
         let dir_size = dir_size.unwrap();
         currentDirSizes.push(dir_size);
 
-        println!("Location: {}      size: {}      line: {}  ", location, dir_size, line);
+        println!("size: {}      line: {}  ", dir_size, line);
 
         
     }
@@ -99,7 +86,7 @@ pub fn stage1() {
         let dir_size = currentDirSizes.pop();
         let dir_size = dir_size.unwrap();
         if dir_size < 100000 {
-            println!("{} {}", location, dir_size);
+            println!("{}", dir_size);
             size_counter += dir_size;
             let old_size = currentDirSizes.pop();
             let old_size = old_size.unwrap();
@@ -109,20 +96,14 @@ pub fn stage1() {
         }
         let mut new_location = "".to_string();
                 
-        let locations = location.split("/").collect::<Vec<&str>>();
-
-        for i in 0..locations.len()-2 {
-            new_location = new_location + locations[i] + "/";
-        }
-
-        location = new_location;
+        
     }
 
     //add the root directory size if it is less than 100000
     let dir_size = currentDirSizes.pop();
     let dir_size = dir_size.unwrap();
     if dir_size < 100000 {
-        println!("Root: {} {}", location, dir_size);
+        println!("Root: {}", dir_size);
         size_counter += dir_size;
     }
 
@@ -145,13 +126,34 @@ pub fn stage2() {
     //split input into lines as an array
     let mut lines = list.lines();
     
-    let mut location = "".to_string();
+
 
     let mut currentDirSizes = Vec::new();
 
-    let mut size_counter = 0;
 
     currentDirSizes.push(0);
+
+    
+
+    
+
+    //Find the space remaining
+    let mut space_remaining = 70000000;
+    for line in lines {
+        if !line.starts_with("$") && !line.starts_with("dir") {
+            //file
+            let file_size = line.split(" ").nth(0).unwrap();
+            space_remaining -= file_size.parse::<usize>().unwrap();
+        }
+    }
+
+    let space_to_clear = 30000000 - space_remaining;
+
+    println!("Space to clear: {}", space_to_clear);
+    
+    let mut folder_to_clear_size = 70000000 - space_remaining; //set to the size of the root directory
+
+    let mut lines = list.lines();
 
     //skip the first line
     lines.next();
@@ -165,16 +167,8 @@ pub fn stage2() {
 
             if dir_name == ".." {
                 //go up a directory
-                //remove the last directory from the location
-                let mut new_location = "".to_string();
                 
-                let locations = location.split("/").collect::<Vec<&str>>();
-
-                for i in 0..locations.len()-2 {
-                    new_location = new_location + locations[i] + "/";
-                }
-
-                location = new_location;
+                
 
                 
                 
@@ -187,16 +181,12 @@ pub fn stage2() {
                 currentDirSizes.push(new_size);
                 
 
-                if dir_size <= 100000 {
-                    
-                    size_counter += dir_size;
-                    
-                    println!("+({}, {})", dir_size, location)
-
+                if dir_size < folder_to_clear_size && dir_size >= space_to_clear {
+                    folder_to_clear_size = dir_size;
                 }
             } else {
                 //go down a directory
-                location = location + dir_name + "/";
+                
                 currentDirSizes.push(0);
             }
             continue;
@@ -222,7 +212,7 @@ pub fn stage2() {
         let dir_size = dir_size.unwrap();
         currentDirSizes.push(dir_size);
 
-        println!("Location: {}      size: {}      line: {}  ", location, dir_size, line);
+        println!("size: {}      line: {}  ", dir_size, line);
 
         
     }
@@ -231,34 +221,21 @@ pub fn stage2() {
     while currentDirSizes.len() > 1 {
         let dir_size = currentDirSizes.pop();
         let dir_size = dir_size.unwrap();
-        if dir_size < 100000 {
-            println!("{} {}", location, dir_size);
-            size_counter += dir_size;
-            let old_size = currentDirSizes.pop();
-            let old_size = old_size.unwrap();
-            let new_size = old_size + dir_size;
-            currentDirSizes.push(new_size);
+        let old_size = currentDirSizes.pop();
+        let old_size = old_size.unwrap();
+        let new_size = old_size + dir_size;
+        currentDirSizes.push(new_size);
 
+        if dir_size < folder_to_clear_size && dir_size >= space_to_clear {
+            folder_to_clear_size = dir_size;
         }
-        let mut new_location = "".to_string();
+
+        
                 
-        let locations = location.split("/").collect::<Vec<&str>>();
-
-        for i in 0..locations.len()-2 {
-            new_location = new_location + locations[i] + "/";
-        }
-
-        location = new_location;
-    }
-
-    //add the root directory size if it is less than 100000
-    let dir_size = currentDirSizes.pop();
-    let dir_size = dir_size.unwrap();
-    if dir_size < 100000 {
-        println!("Root: {} {}", location, dir_size);
-        size_counter += dir_size;
+        
     }
 
 
-    println!("total size: {}", size_counter);
+
+    println!("Size to delete: {}", folder_to_clear_size);
 }
