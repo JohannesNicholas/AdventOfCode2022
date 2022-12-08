@@ -139,8 +139,18 @@ pub fn stage2() {
 
     //Find the space remaining
     let mut space_remaining = 70000000;
-    for line in lines {
-        if !line.starts_with("$") && !line.starts_with("dir") {
+    
+    for line in lines.clone() {
+        if line.starts_with("$ cd ") {
+            continue;
+        }
+        else if line.starts_with("$ ls") {
+            continue;
+        }
+        else if line.starts_with("dir") {
+            continue;
+        }
+        else {
             //file
             let file_size = line.split(" ").nth(0).unwrap();
             space_remaining -= file_size.parse::<usize>().unwrap();

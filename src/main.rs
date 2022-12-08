@@ -16,8 +16,37 @@ fn main() {
     day7::stage2();
 }
 
+
+struct tree_node {
+    value: i32,
+    children: Vec<Box<tree_node>>,
+}
+
 fn day2stage1() {
     println!("Day 2 challenge!");
+
+    let mut tree = tree_node {
+        value: 0,
+        children: Vec::new(),
+    };
+
+    //add the first node
+    tree.children.push(Box::new(tree_node {
+        value: 1,
+        children: Vec::new(),
+    }));
+
+    //borrow the first node
+    let mut current_node = &mut tree.children[0];
+
+    //add the second node
+    current_node.children.push(Box::new(tree_node {
+        value: 2,
+        children: Vec::new(),
+    }));
+
+    //move to the second node
+    current_node = &mut current_node.children[0];
 
     //take input from file
     let list = fs::read_to_string("input.txt").expect("Error reading file");
