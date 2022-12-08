@@ -2,18 +2,19 @@
 use std::fs;
 
 //use the day3.rs file
-mod day3;
-mod day4;
-mod day5;
-mod day6;
-mod day7;
+//mod day3;
+//mod day4;
+//mod day5;
+//mod day6;
+//mod day7;
+mod day8;
 
 fn main() {
     //stage1();
     //stage2();
     //day2stage1();
-    day7::stage1();
-    day7::stage2();
+    day8::stage1();
+    day8::stage2();
 }
 
 
