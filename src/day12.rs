@@ -45,6 +45,7 @@ pub fn stage1() {
     }
 
 
+
     let mut costs = [[1000; size_x]; size_y];
     let mut previous = [[(0, 0); size_x]; size_y];
 
@@ -198,10 +199,10 @@ pub fn stage2() {
             let current_height = height_map[current.1][current.0];
     
             let neighbors = vec![
-                (current.0 as i32, current.1 as i32 - 1),
-                (current.0 as i32, current.1 as i32 + 1),
-                (current.0 as i32 - 1, current.1 as i32),
-                (current.0 as i32 + 1, current.1 as i32),
+                (current.0 as i32, current.1 as i32 - 1), // Top
+                (current.0 as i32, current.1 as i32 + 1), // Bottom
+                (current.0 as i32 - 1, current.1 as i32), // Left
+                (current.0 as i32 + 1, current.1 as i32), // Right
             ];
     
             for neighbor in neighbors {
