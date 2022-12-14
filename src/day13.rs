@@ -1,9 +1,10 @@
-use std::{fs, rc::Rc};
+use std::{fs, rc::Rc, cmp::Ordering};
 
 
 struct tree_node {
     value: Option<i32>,
     children: Vec<Box<tree_node>>,
+    divider: bool,
 }
 
 pub fn stage1() {
@@ -37,10 +38,12 @@ pub fn stage1() {
         let mut left_tree = tree_node {
             value: None,
             children: Vec::new(),
+            divider: false,
         };
         let mut right_tree = tree_node {
             value: None,
             children: Vec::new(),
+            divider: false,
         };
 
         let mut first_chars = first.chars().collect::<Vec<char>>();
@@ -136,10 +139,12 @@ fn tree_order_correct(left: &tree_node, right: &tree_node) -> Option<bool> {
             let mut left_tree = tree_node {
                 value: None,
                 children: Vec::new(),
+                divider: false,
             };
             left_tree.children.push(Box::new(tree_node {
                 value: Some(left.value.unwrap()),
                 children: Vec::new(),
+                divider: false,
             }));
             return tree_order_correct(&left_tree, right);
         }
@@ -149,10 +154,12 @@ fn tree_order_correct(left: &tree_node, right: &tree_node) -> Option<bool> {
             let mut right_tree = tree_node {
                 value: None,
                 children: Vec::new(),
+                divider: false,
             };
             right_tree.children.push(Box::new(tree_node {
                 value: Some(right.value.unwrap()),
                 children: Vec::new(),
+                divider: false,
             }));
             return tree_order_correct(&left, &right_tree);
         }
@@ -204,6 +211,7 @@ fn build_tree(chars: Vec<char>, current_node: &mut tree_node) {
             current_node.children.push(Box::new(tree_node {
                 value: None,
                 children: Vec::new(),
+                divider: false,
             }));
 
             //find where the bracket ends
@@ -257,6 +265,7 @@ fn build_tree(chars: Vec<char>, current_node: &mut tree_node) {
             current_node.children.push(Box::new(tree_node {
                 value: Some(value),
                 children: Vec::new(),
+                divider: false,
             }));
 
             
@@ -268,5 +277,132 @@ fn build_tree(chars: Vec<char>, current_node: &mut tree_node) {
 
 
 pub fn stage2() {
+    println!("Day 13 challenge! pt.2");
+
+    //take input from file
+    let list = fs::read_to_string("input.txt").expect("Error reading file");
+
+    //get the lines
+    let mut lines = list.lines();
     
+    let mut count = 0;
+    
+
+    let mut trees = Vec::new();
+
+    //add the two divider trees
+    trees.push(tree_node {
+        value: None,
+        children: Vec::new(),
+        divider: true,
+    });
+    trees.push(tree_node {
+        value: None,
+        children: Vec::new(),
+        divider: true,
+    });
+    trees[0].children.push(Box::new(tree_node {
+        value: None,
+        children: Vec::new(),
+        divider: false,
+    }));
+    trees[1].children.push(Box::new(tree_node {
+        value: None,
+        children: Vec::new(),
+        divider: false,
+    }));
+    trees[0].children[0].children.push(Box::new(tree_node {
+        value: None,
+        children: Vec::new(),
+        divider: false,
+    }));
+    trees[1].children[0].children.push(Box::new(tree_node {
+        value: None,
+        children: Vec::new(),
+        divider: false,
+    }));
+    trees[0].children[0].children[0].children.push(Box::new(tree_node {
+        value: Some(2),
+        children: Vec::new(),
+        divider: false,
+    }));
+    trees[1].children[0].children[0].children.push(Box::new(tree_node {
+        value: Some(6),
+        children: Vec::new(),
+        divider: false,
+    }));
+
+
+
+    //convert lines into a list
+    let mut list = Vec::new();
+    for line in lines {
+        list.push(line);
+    }
+
+    //let mut correct_lines = Vec::new();
+
+    for line_num in 0..(list.len() / 3) {
+        let first = list[line_num * 3];
+        let second = list[line_num * 3 + 1];
+
+        let mut left_tree = tree_node {
+            value: None,
+            children: Vec::new(),
+            divider: false,
+        };
+        let mut right_tree = tree_node {
+            value: None,
+            children: Vec::new(),
+            divider: false,
+        };
+
+        let mut first_chars = first.chars().collect::<Vec<char>>();
+        let mut second_chars = second.chars().collect::<Vec<char>>();
+
+        //remove the first and last characters as these are brackets
+
+        build_tree(first_chars, &mut left_tree);
+        build_tree(second_chars, &mut right_tree);
+
+        trees.push(left_tree);
+        trees.push(right_tree);
+        
+    }
+
+    
+
+    //sort the trees
+    trees.sort_by(|a, b| tree_sort_order(a, b));
+
+
+    let mut counter = 1;
+
+    //print the trees
+    for i in 0..trees.len() {
+        let tree = &trees[i];
+        println!("{}", print_tree(&tree));
+        if tree.divider {
+            println!("----------------");
+            counter *= (i + 1);
+        }
+
+    }
+
+    println!("TOTAL: {}", counter);
+}
+
+
+fn tree_sort_order(a: &tree_node, b: &tree_node) -> Ordering {
+    let value = tree_order_correct(a, b).unwrap();
+    
+    if value == true {
+        return Ordering::Less;
+    }
+    else if value == false {
+        return Ordering::Greater;
+    }
+    else {
+        return Ordering::Equal;
+    }
 }
