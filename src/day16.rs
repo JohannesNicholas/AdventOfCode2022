@@ -130,7 +130,7 @@ struct flow_cache_key{
     valves: [(char, char); 15],
     valve: (char, char),
 }
-static mut flow_cache: Option<HashMap<[(char,char);16], i32>> = None;
+static mut flow_cache: Option<HashMap<([(char,char);16], i32), i32>> = None;
 
 fn most_flow(values : &HashMap<(char, char), valve>, valuable_locations: HashMap<(char, char), bool>, minutes: i32, valve: (char, char)) -> i32 {
 
@@ -145,7 +145,7 @@ fn most_flow(values : &HashMap<(char, char), valve>, valuable_locations: HashMap
     //check if the value is in the cache
     unsafe {
         if let Some(cache) = &flow_cache {
-            if let Some(value) = cache.get(&key) {
+            if let Some(value) = cache.get(&(key, minutes)) {
                 return *value;
             }
         }
@@ -174,7 +174,7 @@ fn most_flow(values : &HashMap<(char, char), valve>, valuable_locations: HashMap
     }
 
 
-    if valuable_locations.len() > 9 {
+    if valuable_locations.len() > 7 {
         println!("Looking at {:?}", valuable_locations.keys());
     }
 
@@ -184,7 +184,7 @@ fn most_flow(values : &HashMap<(char, char), valve>, valuable_locations: HashMap
             flow_cache = Some(HashMap::new());
         }
         let cache = flow_cache.as_mut().unwrap();
-        cache.insert(key, most_flow_amonut + minutes * values.get(&valve).unwrap().flow_rate);
+        cache.insert((key, minutes), most_flow_amonut + minutes * values.get(&valve).unwrap().flow_rate);
 
         flow_cache = Some(cache.clone());
     }
