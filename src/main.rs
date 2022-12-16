@@ -15,6 +15,7 @@ fn main() {
     //stage2();
     //day2stage1();
     //day15::stage1();
+    day16::stage1();
     day16::stage2();
 }
 
