@@ -78,82 +78,6 @@ pub fn stage1() {
         });
     }
 
-    //set AA to have a combined flow rate of 1
-    valves.get_mut(&('A', 'A')).unwrap().combined_flow_rate = 1;
-
-    let mut queue = Vec::new();
-
-    //add the first valve to the queue
-    queue.push(('A', 'A'));
-
-    //while there are still valves in the queue
-    while queue.len() > 0 {
-        //get the first valve
-        let current_valve_chars = queue.remove(0);
-
-        
-
-        //get the valve
-        let current_valve = valves.get(&current_valve_chars).unwrap();
-
-        let tunnels = current_valve.tunnels.clone();
-
-        let combined_flow_rate = current_valve.combined_flow_rate;
-
-        let current_steps = current_valve.steps;
-
-        println!("Looking at {}{} which has combined flow rate of {}", current_valve_chars.0, current_valve_chars.1,combined_flow_rate);
-
-        //loop through the tunnels
-        for tunnel in tunnels {
-            //get the valve
-            let tunnel_valve = valves.get_mut(&tunnel).unwrap();
-
-            let minutes_remaining = 30 - current_steps - 1;
-
-            let calc_flow = combined_flow_rate + tunnel_valve.flow_rate * minutes_remaining;
-
-            println!("{}{} has flow rate of {} and combined flow rate of {}", tunnel.0, tunnel.1, tunnel_valve.flow_rate, calc_flow);
-
-            if calc_flow > tunnel_valve.combined_flow_rate {
-
-                //if it is a node that has flor
-                if tunnel_valve.flow_rate > 0 {
-                    //make sure it is not on the path back
-                    let mut on_path_back = false;
-                    let mut current_valve = current_valve_chars;
-
-                    while !on_path_back && current_valve != (' ', ' ') {
-                        //get the valve
-                        let valve = valves.get(&current_valve).unwrap();
-
-                        //if the current valve is the same as the tunnel
-                        if valve.previous_valve == tunnel {
-                            on_path_back = true;
-                        } else {
-                            //if it is not the same, set the current valve to the previous valve
-                            current_valve = valve.previous_valve;
-                        }
-
-                    }
-
-                }
-
-                tunnel_valve.combined_flow_rate = calc_flow;
-                tunnel_valve.previous_valve = current_valve_chars;
-                tunnel_valve.steps = current_steps + 1;
-
-                //add to the queue
-                queue.push(tunnel);
-            }
-
-            
-        }
-
-
-    }
-    
-
     
 
     //print out the hashmap
@@ -161,6 +85,76 @@ pub fn stage1() {
         println!("{}{}: {:?} - {:?}", key.0, key.1, value.flow_rate, value.tunnels);
     }
 
+    //find the way
+    let highest_way = find_way(&mut valves, vec![('A', 'A')], 30);
+
+    println!("Highest way: {}", highest_way.0);
+
+    println!("Path: {:?}", highest_way.1);
+
 }
+
+
+fn find_way(valves: &mut HashMap<(char, char), valve>, path: Vec<(char, char)>, minutes: i32) -> (i32, Vec<(char, char)>) {
+
+    
+
+    //get the last valve
+    let last_valve = path[path.len() - 1];
+
+    if minutes < 0 {
+        println!("Path: {:?}", path);
+        return (0, vec![]);
+    }
+
+    //get the valve
+    let mut valve = valves.get(&last_valve).unwrap();
+
+    let flow_rate = valve.flow_rate;
+    let tunnels_copy = valve.tunnels.clone();
+
+
+    //if the valve has already been visited
+    let mut already_visited = false;
+    for i in 0..(path.len()-1) {
+        if flow_rate > 0 {
+            let node = &path[i];
+            if *node == last_valve {
+                already_visited = true;
+                break;
+            }
+        }
+        
+    }
+
+    //if the valve has already been visited
+    if already_visited {
+        return (0, vec![]);
+    }
+
+
+    let mut highest_way = (0, vec![]);
+    //loop through the tunnels
+    for tunnel in tunnels_copy {
+
+        //add the tunnel to the path
+        let mut new_path = path.clone();
+        new_path.push(tunnel);
+
+        //find the way
+        let way = find_way(valves, new_path, minutes-1);
+
+        //if the way is higher than the highest way
+        if way.0 > highest_way.0 {
+            highest_way = way;
+        }
+        
+    }
+
+    highest_way.1.push(last_valve);
+
+    return (highest_way.0 + flow_rate * minutes, highest_way.1);
+}
+
 
 pub fn stage2() {}
