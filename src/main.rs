@@ -7,15 +7,15 @@ use std::fs;
 //mod day5;
 //mod day6;
 //mod day7;
-mod day14;
+mod day16;
 
 
 fn main() {
     //stage1();
     //stage2();
     //day2stage1();
-    day14::stage1();
-    day14::stage2();
+    //day15::stage1();
+    day16::stage2();
 }
 
 
